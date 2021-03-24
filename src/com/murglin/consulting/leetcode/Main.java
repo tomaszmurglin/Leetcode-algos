@@ -13,7 +13,7 @@ public class Main {
         // write your code here
         final var main = new Main();
         final var solution = main.new Solution();
-        var result = solution.canCompleteCircuit(new int[] {4,5,3,1,4}, new int[] {5,4,3,4,2});
+        var result = solution.findMinNumberOfCoinsToInverse(new int[] {1, 1, 0, 1, 1});
         System.out.println(result);
     }
 
@@ -72,12 +72,13 @@ public class Main {
                     var amountOfGasTanked = gasStations.get(i);
                     var numberOfGasBurnDuringTravelToNextStation = costs.get(i);
                     amountOfGasInTheGasTankAfterTravelToNextStation =
-                        amountOfGasInTheGasTankAfterTravelToNextStation + amountOfGasTanked - numberOfGasBurnDuringTravelToNextStation;
+                        amountOfGasInTheGasTankAfterTravelToNextStation + amountOfGasTanked -
+                            numberOfGasBurnDuringTravelToNextStation;
                     var isTravelToLastGasStation = gasStationsVisited == numberOfGasStations;
                     if (amountOfGasInTheGasTankAfterTravelToNextStation <= 0 && !isTravelToLastGasStation) {
                         break;
                     }
-                    if(amountOfGasInTheGasTankAfterTravelToNextStation >= 0){
+                    if (amountOfGasInTheGasTankAfterTravelToNextStation >= 0) {
                         gasStationsVisited++;
                     }
                     var isLastGasStation = gasStationsVisited == numberOfGasStations + 1;
@@ -89,5 +90,54 @@ public class Main {
             return -1;
         }
 
+
+        public int findMinNumberOfCoinsToInverse(int[] A) {
+            // write your code in Java SE 8
+            final int[] coins = A; //A name was not meaningful
+            final int coinsQuantity = coins.length;
+
+            validate(coins, coinsQuantity);
+
+            if (coinsQuantity == 1) {
+                return 0;
+            }
+            int quantityOfCoinsToInverse = countCoinsToInverse(coins);
+
+            int firstCoin = coins[0];
+            int inversedFirstCoin = firstCoin == 0 ? 1 : 0;
+            coins[0] = inversedFirstCoin;
+            int alternativeQuantityOfCoinsToInverse = countCoinsToInverse(coins);
+
+            return Math.min(quantityOfCoinsToInverse, alternativeQuantityOfCoinsToInverse);
+        }
+
+        private void validate(int[] A, final int coinsQuantity) {
+            if (coinsQuantity < 1 || coinsQuantity > 100) {
+                throw new IllegalArgumentException("Coins quantity doesnt match expected value");
+            }
+            final long filteredCoinsQuantity = Arrays.stream(A).filter(coin -> coin == 0 || coin == 1).count();
+            if (filteredCoinsQuantity < coinsQuantity) {
+                throw new IllegalArgumentException("Coins should have only value 0 or 1");
+            }
+        }
+
+        private int countCoinsToInverse(int[] coins) {
+            int firstCoin = coins[0];
+            int inversedFirstCoin = firstCoin == 0 ? 1 : 0;
+            int quantityOfCoinsToInverse = 0;
+            for (int i = 0; i < coins.length; i++) {
+                boolean isOddNumberOfCoin = i % 2 == 1;
+                if (isOddNumberOfCoin) {
+                    if (coins[i] != inversedFirstCoin) {
+                        quantityOfCoinsToInverse++;
+                    }
+                } else {
+                    if (coins[i] != firstCoin) {
+                        quantityOfCoinsToInverse++;
+                    }
+                }
+            }
+            return quantityOfCoinsToInverse;
+        }
     }
 }
